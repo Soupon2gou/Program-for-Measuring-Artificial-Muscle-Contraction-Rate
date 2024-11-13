@@ -16,7 +16,7 @@ if image is None or start_template is None:
     raise FileNotFoundError("画像ファイルが見つかりません")
 
 ret_image = image.copy()
-for i in range(60,80,1):
+for i in range(10,100,1):
     t2 = start_template.copy()
     # 画像サイズを拡大
     t3 = cv2.resize(t2, (int(t2.shape[1]*i/100), int(t2.shape[0]*i/100)))

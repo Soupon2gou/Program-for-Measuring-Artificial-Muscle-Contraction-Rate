@@ -12,16 +12,16 @@ end_template = cv2.imread(end_template_path, cv2.IMREAD_GRAYSCALE)
 
 #start_templateとend_templateの拡大率を71%にする
 #t3 = cv2.resize(t2, (int(t2.shape[1]*i/100), int(t2.shape[0]*i/100)))
-start_template_resized = cv2.resize(start_template, (int(start_template.shape[1]*71/100), int(start_template.shape[0]*71/100)))
-end_template_resized = cv2.resize(end_template, (int(end_template.shape[1]*71/100), int(end_template.shape[0]*71/100)))
+start_template = cv2.resize(start_template, (int(start_template.shape[1]*71/100), int(start_template.shape[0]*71/100)))
+end_template = cv2.resize(end_template, (int(end_template.shape[1]*71/100), int(end_template.shape[0]*71/100)))
 
 if image is None or start_template is None or end_template is None:
     raise FileNotFoundError("画像ファイルが見つかりません")
 
 # テンプレートマッチングの手法
 methods = {
-    "SSD": cv2.TM_SQDIFF,
-    "SAD": cv2.TM_SQDIFF_NORMED,
+    # "SSD": cv2.TM_SQDIFF,
+    # "SAD": cv2.TM_SQDIFF_NORMED,
     "NCC": cv2.TM_CCORR_NORMED,
     "ZNCC": cv2.TM_CCOEFF_NORMED
 }
@@ -75,15 +75,19 @@ for method_name, result in results.items():
     start_center = result["start_center"]
     end_center = result["end_center"]
     #一致したテンプレートを描画
+    # 始点に緑の四角を描画
     cv2.rectangle(output_image, (start_center[0] - start_template.shape[1] // 2, start_center[1] - start_template.shape[0] // 2),
                   (start_center[0] + start_template.shape[1] // 2, start_center[1] + start_template.shape[0] // 2),
                   (0, 255, 0), 2)
+    # 終点に赤の四角を描画
+    cv2.rectangle(output_image, (end_center[0] - end_template.shape[1] // 2, end_center[1] - end_template.shape[0] // 2),
+                    (end_center[0] + end_template.shape[1] // 2, end_center[1] + end_template.shape[0] // 2),
+                    (0, 0, 255), 2)
     cv2.circle(output_image, start_center, 5, (0, 255, 0), -1)
     cv2.circle(output_image, end_center, 5, (0, 0, 255), -1)
     cv2.line(output_image, start_center, end_center, (255, 0, 0), 2)
     cv2.putText(output_image, method_name, (start_center[0] + 10, start_center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
     
-
 # 画像を表示
 cv2.imshow("Result", output_image)
 cv2.waitKey(0)
