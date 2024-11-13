@@ -16,7 +16,7 @@ if image is None or start_template is None:
     raise FileNotFoundError("画像ファイルが見つかりません")
 
 ret_image = image.copy()
-for i in range(10,100,1):
+for i in range(40,60,1):
     t2 = start_template.copy()
     # 画像サイズを拡大
     t3 = cv2.resize(t2, (int(t2.shape[1]*i/100), int(t2.shape[0]*i/100)))
@@ -27,6 +27,8 @@ for i in range(10,100,1):
     for pt in zip(*loc[::-1]):
         ret_image = cv2.rectangle(ret_image, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
         print(pt,",拡大率:",i)
-
+        # 類似度を表示
+        print("類似度:",result[pt[1],pt[0]])
+    
 # 画像を表示,画像のテンプレートが一致した位置に赤い四角を描画
 show_image("Result", ret_image)

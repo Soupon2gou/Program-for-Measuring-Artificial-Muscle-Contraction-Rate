@@ -10,10 +10,11 @@ image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 start_template = cv2.imread(start_template_path, cv2.IMREAD_GRAYSCALE)
 end_template = cv2.imread(end_template_path, cv2.IMREAD_GRAYSCALE)
 
-#start_templateとend_templateの拡大率を71%にする
+#start_templateとend_templateの拡大率を47%にする
 #t3 = cv2.resize(t2, (int(t2.shape[1]*i/100), int(t2.shape[0]*i/100)))
-start_template = cv2.resize(start_template, (int(start_template.shape[1]*71/100), int(start_template.shape[0]*71/100)))
-end_template = cv2.resize(end_template, (int(end_template.shape[1]*71/100), int(end_template.shape[0]*71/100)))
+scale =47
+start_template = cv2.resize(start_template, (int(start_template.shape[1]*scale/100), int(start_template.shape[0]*scale/100)))
+end_template = cv2.resize(end_template, (int(end_template.shape[1]*scale/100), int(end_template.shape[0]*scale/100)))
 
 if image is None or start_template is None or end_template is None:
     raise FileNotFoundError("画像ファイルが見つかりません")
@@ -22,7 +23,7 @@ if image is None or start_template is None or end_template is None:
 methods = {
     # "SSD": cv2.TM_SQDIFF,
     # "SAD": cv2.TM_SQDIFF_NORMED,
-    "NCC": cv2.TM_CCORR_NORMED,
+    #"NCC": cv2.TM_CCORR_NORMED,
     "ZNCC": cv2.TM_CCOEFF_NORMED
 }
 
@@ -30,9 +31,10 @@ methods = {
 results = {}
 
 for method_name, method in methods.items():
-    # テンプレートマッチング
-    result_start = cv2.matchTemplate(image, start_template, method)
+    # テンプレートマッチングresult_startはimageの左半分、result_endは右半分に適用
+    result_start = cv2.matchTemplate(image[:, :image.shape[1]//2], start_template, method)
     result_end = cv2.matchTemplate(image, end_template, method)
+    
     
     # 最も一致する位置を取得
     min_val_start, max_val_start, min_loc_start, max_loc_start = cv2.minMaxLoc(result_start)
@@ -92,21 +94,3 @@ for method_name, result in results.items():
 cv2.imshow("Result", output_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-# 始点と終点の色を変えてimgを表示
-# if start_point:
-#     for dy in range(-1, 2):
-#         for dx in range(-1, 2):
-#             y = start_point[1] + dy
-#             x = start_point[0] + dx
-#             if 0 <= y < img.shape[0] and 0 <= x < img.shape[1]:
-#                 # 始点の周り9ピクセル
-#                 img[y, x] = 127
-
-# if end_point:
-#     for dy in range(-1, 2):
-#         for dx in range(-1, 2):
-#             y = end_point[1] + dy
-#             x = end_point[0] + dx
-#             if 0 <= y < img.shape[0] and 0 <= x < img.shape[1]:
-#                 img[y, x] = 127  # 終点の周り9ピクセル
