@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 
 # 画像読み込み
-image_path = "hi_kukkyoku_pattern.jpg"
-start_template_path = "pattern_start.jpg"
-end_template_path = "pattern_end.jpg"
+image_path = "./resources/hi_kukkyoku_pattern.jpg"
+start_template_path = "./resources/pattern_start.jpg"
+end_template_path = "./resources/pattern_end.jpg"
 
 image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 start_template = cv2.imread(start_template_path, cv2.IMREAD_GRAYSCALE)

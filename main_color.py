@@ -4,7 +4,7 @@ import threepoint_all_position as thpy
 # print(cv2)
 
 # 画像読み込み
-image_path = "hi_kukkyoku.jpg"  # 画像のパス
+image_path = ".\\resources\\hi_kukkyoku.jpg"  # 画像のパス
 # image_path = "black.png"  # 画像のパス
 image = cv2.imread(image_path)  # 画像の読み込み
 #画像の解像度をHHDに変更
