@@ -37,6 +37,7 @@ for method_name, method in methods.items():
     
     
     # 最も一致する位置を取得
+    # minMaxLocは最小値と最大値の位置を返す
     min_val_start, max_val_start, min_loc_start, max_loc_start = cv2.minMaxLoc(result_start)
     min_val_end, max_val_end, min_loc_end, max_loc_end = cv2.minMaxLoc(result_end)
     
@@ -92,5 +93,7 @@ for method_name, result in results.items():
     
 # 画像を表示
 cv2.imshow("Result", output_image)
+# 画像の保存
+cv2.imwrite("result.jpg", output_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

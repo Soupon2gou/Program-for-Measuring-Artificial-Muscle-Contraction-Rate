@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import decide_kakudairitu
 def show_image(title, image):
     cv2.imshow(title, image)
     cv2.waitKey()
