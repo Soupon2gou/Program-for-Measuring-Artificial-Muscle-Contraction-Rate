@@ -1,103 +1,92 @@
 import cv2
 import numpy as np
-import threepoint_all_position as thpy
-# print(cv2)
-
+import sys
 # 画像読み込み
 image_path = ".\\resources\\hi_kukkyoku.jpg"  # 画像のパス
 # image_path = "black.png"  # 画像のパス
 image = cv2.imread(image_path)  # 画像の読み込み
-#画像の解像度をHHDに変更
-image = cv2.resize(image, dsize=(1920, 1080))
 if image is None:
     raise FileNotFoundError(f"画像ファイルが見つかりません: {image_path}")
-# 画像のトリミング
-trimmed_image = image[400:460, 490:1400]
-trimmed_image_width = trimmed_image.shape[1]
+#画像のリサイズHD画質に変換
+image = cv2.resize(image, dsize=(1280,720))
+# 元画像をコピーしておく
+image_copy = image.copy()
+# RGBからHSVに変換
+image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+# 画像を表示
+cv2.imshow("image", image)
+cv2.waitKey(0)
+########################################################################
+# imageにおいて赤色を全探索して、その座標を取得する
+# 赤色の閾値を設定
+lower_red1 = np.array([0, 120, 70])   # 下限 (色相, 彩度, 明度)
+upper_red1 = np.array([10, 255, 255]) # 上限
+
+# 赤色の部分をimageから取得
+mask = cv2.inRange(image, lower_red1, upper_red1)
+
+#　bitwise_andを使うには2つの画像サイズ + タイプが同じである必要がある。
+# print(img1.shape, img2.shape), print(type(img1), type(img2))して、値が等しいことを確認
+# 画像のサイズを確認
+print(image.shape, mask.shape)
+
+# 赤色の部分をimageから取得
+red = cv2.bitwise_and(image, image, mask=mask) #bitwise_and(元画像, 元画像, マスク画像)
+
+# 赤色の部分の位置を取得
+red_pos = np.where(mask == 255)
+
+# 赤色の部分の位置をcopy_imageに描画
+image_copy[red_pos[0], red_pos[1]] = [0, 0, 255]
+print(red_pos)
 
 ########################################################################
-# 画像の初期処理
-th =70
-# グレースケール変換
-trimmed_image = cv2.cvtColor(trimmed_image, cv2.COLOR_BGR2GRAY)
+# 青色の部分を全探索して、その座標を取得する
+# 青色の閾値を設定
+lower_blue1 = np.array([100, 50, 50])   # 下限 (色相, 彩度, 明度)
+upper_blue1 = np.array([130, 255, 255]) # 上限
 
-#threepoint_all_position.pyのリストを取得して不要な範囲を白にする
-#ファイルの読み込み
-# white_list= thpy.pixels
-# for pixel in white_list:
-#     trimmed_image[pixel[1], pixel[0]] = 255
 
-#ガウシアンフィルタをかける
-trimmed_image = cv2.GaussianBlur(trimmed_image, (5, 5), 0)
+# 青色の部分をimageから取得
+mask = cv2.inRange(image, lower_blue1, upper_blue1)
 
-# 二値化
-_, trimmed_image = cv2.threshold(trimmed_image, th, 255, cv2.THRESH_BINARY)
-# cv2.imshow("binary", trimmed_image)
+# 青色の部分をimageから取得
+blue = cv2.bitwise_and(image, image, mask=mask)
 
-#edge detection
+# 青色の部分の位置を取得
+blue_pos = np.where(mask == 255)
 
-# edges = cv2.Canny(trimmed_image, 100, 200)
+# 青色の部分の位置をimage_copyに描画
+image_copy[blue_pos[0], blue_pos[1]] = [255, 0, 0]
 
-# show edge detection
+########################################################################
+#前提として赤色の座標はただ一つと仮定
+#赤色の座標を取得
+red_pos = np.array([red_pos[0][0], red_pos[1][0]])
+# red_posが画像の範囲外の場合
+if red_pos[0] >= image_copy.shape[0] or red_pos[1] >= image_copy.shape[1]:
+    raise ValueError("赤色の座標が画像の範囲外です")
 
-# cv2.imshow("edges", edges)
+#青色の座標を取得
+blue_pos = np.array([blue_pos[0][0], blue_pos[1][0]])
 
-#findstartpointという関数を作成
-def findstartpoint(trimmed_image):
-    trimmed_image_width = trimmed_image.shape[1]
-    for b in range(0, 256):  # 0から255までの値で探索       
-        for x in range(5,trimmed_image_width,1):
-            for y in range(trimmed_image.shape[0]):
-                if trimmed_image[y, x] == b:  # 黒めのピクセルを見つけたら
-                    start_point = (x, y)
-                    print("color_number: ", b)
-                    return start_point
+print(f"赤色の座標: {red_pos}")
+print(f"青色の座標: {blue_pos}")
 
-#左端から上下にピクセルを全探索して黒だったらそこを始点とする
-start_point = findstartpoint(trimmed_image)
-                
+#赤色の座標に〇を描画
+cv2.circle(image_copy, tuple(red_pos), 100, (0, 0, 255), 100) # (画像, 中心座標, 半径, 色, 線の太さ)
 
-#findendpointという関数を作成
+#青色の座標に〇を描画
+cv2.circle(image_copy, tuple(blue_pos), 10, (255, 0, 0), 100) # (画像, 中心座標, 半径, 色, 線の太さ)
 
-def findendpoint(trimmed_image):
-    trimmed_image_width = trimmed_image.shape[1]
-    for b in range(0, 256):  # 0から255までの値で探索
-        for x in range(trimmed_image_width - 6, -1, -1): #rangeの因数の意味は、(開始位置, 終了位置, ステップ)で、-1は��順を意味する
-            for y in range(trimmed_image.shape[0]):
-                if trimmed_image[y, x] == b:  # ��いピクセルを見つけたら
-                    end_point = (x, y)
-                    print("color_number: ", b)
-                    return end_point
-                
-#右端から上下にピクセルを全探索して黒だったらそこを終点とする
-end_point = findendpoint(trimmed_image)
+#赤色と青色の座標を結ぶ直線を引く
+# cv2.line(image, tuple(red_pos), tuple(blue_pos), (0, 255, 0), 1000) # 直線を引く (画像, 始点, 終点, 色, 太さ)
 
-    # 結果を表示
-if start_point and end_point:
-    print(f"始点: {start_point}, 終点: {end_point}")
-else:
-    print("黒いピクセルが見つかりませんでした")
-
-# 始点と終点の色を変えてtrimmed_imageを表示
-if start_point:
-    for dy in range(-1, 2):
-        for dx in range(-1, 2):
-            y = start_point[1] + dy
-            x = start_point[0] + dx
-            if 0 <= y < trimmed_image.shape[0] and 0 <= x < trimmed_image.shape[1]:
-                # 始点の周り9ピクセルを赤にする
-                trimmed_image[y, x] = 127
-
-if end_point:
-    for dy in range(-1, 2):
-        for dx in range(-1, 2):
-            y = end_point[1] + dy
-            x = end_point[0] + dx
-            if 0 <= y < trimmed_image.shape[0] and 0 <= x < trimmed_image.shape[1]:
-                trimmed_image[y, x] = 127  # 終点の周り9ピクセルを
-
-# トリミングした画像を表示
-cv2.imshow("trimmed_image", trimmed_image)
+################################################################
+# 画像を保存
+cv2.imwrite("output.jpg", image_copy)
+# 画像を表示
+cv2.imshow("image", image_copy)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
