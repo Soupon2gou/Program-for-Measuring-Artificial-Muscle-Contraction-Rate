@@ -37,4 +37,10 @@ def find_red_and_blue(image):
     # 青色の部分の位置を取得
     blue_pos = np.where(mask == 255)
 
-    return red_pos, blue_pos
+    # 赤色の部分の位置をimage_copyに描画
+    image[red_pos[0], red_pos[1]] = [0, 0, 255]
+
+    # 青色の部分の位置をimage_copyに描画
+    image[blue_pos[0], blue_pos[1]] = [255, 0, 0]
+
+    return red_pos, blue_pos, image

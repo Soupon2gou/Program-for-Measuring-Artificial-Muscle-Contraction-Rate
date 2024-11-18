@@ -17,7 +17,4 @@ def calculate_length(red_center_pos, blue_center_pos, image):
     for cnt in contours:
         length += cv2.arcLength(cnt, True)
 
-    # ��色と青色の中心間の距��を計算
-    distance = np.linalg.norm(np.array(red_center_pos) - np.array(blue_center_pos))
-
-    return length, distance
+    return length, image
