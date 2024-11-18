@@ -43,4 +43,4 @@ def find_red_and_blue(image):
     # 青色の部分の位置をimage_copyに描画
     image[blue_pos[0], blue_pos[1]] = [255, 0, 0]
 
-    return red_pos, blue_pos, image
+    return red_pos, blue_pos
