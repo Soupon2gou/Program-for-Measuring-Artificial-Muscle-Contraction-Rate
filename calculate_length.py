@@ -40,10 +40,10 @@ def calculate_length(red_center_pos, green_center_pos, blue_center_pos, image):
         2,
     )
     # 画像を保存
-    cv2.imwrite("output_length.jpg", image)
+    # cv2.imwrite("output_length.jpg", image)
 
     # 画像を表示
-    cv2.imshow("image", image)
-    cv2.waitKey(0)
+    # cv2.imshow("image", image)
+    # cv2.waitKey(0)
 
     return hik_length, k_length

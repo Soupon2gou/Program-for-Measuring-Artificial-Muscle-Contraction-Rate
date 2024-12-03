@@ -79,7 +79,7 @@ def find_point(image):
     )
 
     # imageを表示
-    cv2.imshow("Image", image)
+    # cv2.imshow("Image", image)
     cv2.waitKey(0)
 
     return red_center_pos, green_center_pos, blue_center_pos
