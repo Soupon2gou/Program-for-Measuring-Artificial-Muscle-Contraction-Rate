@@ -15,4 +15,35 @@ def calculate_length(red_center_pos, green_center_pos, blue_center_pos, image):
         blue_center_pos - green_center_pos
     )
 
+    # imageにhik_lengthを測った長さを描画
+    cv2.line(
+        image,
+        tuple(red_center_pos[::-1]),
+        tuple(blue_center_pos[::-1]),
+        (0, 0, 255),
+        2,
+    )
+    # imageにk_lengthを測った長さを描画
+    cv2.line(
+        image,
+        tuple(red_center_pos[::-1]),
+        tuple(green_center_pos[::-1]),
+        (0, 255, 0),
+        2,
+    )
+    # imageにK_lengthを測った長さを描画
+    cv2.line(
+        image,
+        tuple(blue_center_pos[::-1]),
+        tuple(green_center_pos[::-1]),
+        (255, 0, 0),
+        2,
+    )
+    # 画像を保存
+    cv2.imwrite("output_length.jpg", image)
+
+    # 画像を表示
+    cv2.imshow("image", image)
+    cv2.waitKey(0)
+
     return hik_length, k_length
